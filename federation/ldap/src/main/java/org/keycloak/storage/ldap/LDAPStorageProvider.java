@@ -1,20 +1,3 @@
-/*
- * Copyright 2016 Red Hat, Inc. and/or its affiliates
- * and other contributors as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.keycloak.storage.ldap;
 
 import java.util.ArrayList;
@@ -86,11 +69,7 @@ import org.keycloak.storage.user.UserRegistrationProvider;
 
 import static org.keycloak.utils.StreamsUtil.paginatedStream;
 
-/**
- * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
- * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
- * @version $Revision: 1 $
- */
+
 public class LDAPStorageProvider implements UserStorageProvider,
         CredentialInputValidator,
         CredentialInputUpdater,
@@ -436,12 +415,7 @@ public class LDAPStorageProvider implements UserStorageProvider,
 
     protected List<LDAPObject> searchLDAP(RealmModel realm, Map<String, String> attributes) {
 
-        // return a stable ordered result to the caller
-        List<LDAPObject> results = new ArrayList<>();
-
-        // a set to ensure fast uniqueness checks based on equals/hashCode of LDAPObject
-        Set<LDAPObject> unique = new HashSet<>();
-
+        List<LDAPObject> results = new ArrayList<LDAPObject>();
         if (attributes.containsKey(UserModel.USERNAME)) {
             try (LDAPQuery ldapQuery = LDAPUtils.createQueryForUserSearch(this, realm)) {
                 LDAPQueryConditionsBuilder conditionsBuilder = new LDAPQueryConditionsBuilder();
@@ -452,7 +426,6 @@ public class LDAPStorageProvider implements UserStorageProvider,
 
                 List<LDAPObject> ldapObjects = ldapQuery.getResultList();
                 results.addAll(ldapObjects);
-                unique.addAll(ldapObjects);
             }
         }
 
@@ -465,13 +438,7 @@ public class LDAPStorageProvider implements UserStorageProvider,
                 ldapQuery.addWhereCondition(emailCondition);
 
                 List<LDAPObject> ldapObjects = ldapQuery.getResultList();
-                ldapObjects.forEach(ldapObject -> {
-                    // ensure that no entity is listed twice and still preserve the order of returned entities
-                    if (!unique.contains(ldapObject)) {
-                        results.add(ldapObject);
-                        unique.add(ldapObject);
-                    }
-                });
+                results.addAll(ldapObjects);
             }
         }
 
@@ -488,13 +455,7 @@ public class LDAPStorageProvider implements UserStorageProvider,
                 }
 
                 List<LDAPObject> ldapObjects = ldapQuery.getResultList();
-                ldapObjects.forEach(ldapObject -> {
-                    // ensure that no entity is listed twice and still preserve the order of returned entities
-                    if (!unique.contains(ldapObject)) {
-                        results.add(ldapObject);
-                        unique.add(ldapObject);
-                    }
-                });
+                results.addAll(ldapObjects);
             }
         }
 
